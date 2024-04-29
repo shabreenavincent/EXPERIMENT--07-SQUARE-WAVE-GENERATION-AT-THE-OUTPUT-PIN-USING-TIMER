@@ -46,22 +46,17 @@ In normal settings, assuming you’re using the timer module in PWM mode and gen
 
 ## Procedure:
 Step1: Open CubeMX & Create New Project
- ![image](https://user-images.githubusercontent.com/36288975/226189166-ac10578c-c059-40e7-8b80-9f84f64bf088.png)
 
 
 Step2: Choose The Target MCU & Double-Click Its Name select the target to be programmed  as shown below and click on next 
 
- ![image](https://user-images.githubusercontent.com/36288975/226189215-2d13ebfb-507f-44fc-b772-02232e97c0e3.png)
-![image](https://user-images.githubusercontent.com/36288975/226189230-bf2d90dd-9695-4aaf-b2a6-6d66454e81fc.png)
-
-![image](https://user-images.githubusercontent.com/36288975/226189280-ed5dcf1d-dd8d-43ae-815d-491085f4863b.png)
 
 Step3: Configure Timer2 Peripheral To Operate In PWM Mode With CH1 Output
-![image](https://github.com/vasanthkumarch/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/36288975/682c851a-7dfe-4089-8395-f76088d43896)
+
 
 
 Step4: Set The RCC External Clock Source
-![image](https://github.com/vasanthkumarch/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/36288975/8888af3b-63e2-4760-a51b-17b477763941)
+
 
 
 STM32 RCC External Clock Selection CubeMX
@@ -69,7 +64,7 @@ STM32 RCC External Clock Selection CubeMX
 Step5: Go To The Clock Configuration
 
 Step6: Set The System Clock To Be 72MHz
-![image](https://github.com/vasanthkumarch/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/36288975/4ea03faa-fb90-4b31-8079-3db5f959f2c3)
+
 
 
 Step7: Name & Generate The Project Initialization Code For CubeIDE or The IDE You’re Using
@@ -82,13 +77,13 @@ We are now at the last part of step by step guide on how to simulate STM32 proje
 Step9. Create a new Proteus project and place STM32F40xx i.e. the same MCU for which the project was created in STM32Cube IDE. 
 14. After creation of the circuit as per requirement as shown below 
 
- ![image](https://github.com/vasanthkumarch/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/36288975/4f377f5e-bdda-489e-a416-c712c893831d)
+ 
 
 Step10. Double click on the the MCU part to open settings. Next to the Program File option, give full path to the Hex file generated using STM32Cube IDE. Then set the external crystal frequency to 8M (i.e. 8 MHz). Click OK to save the changes.
 
  
 Step14. click on debug and simulate using simulation as shown below 
- ![image](https://github.com/vasanthkumarch/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/36288975/b8efbfc2-f0c5-4106-8117-3a6e7ac87f6c)
+
 
 
  
@@ -101,57 +96,42 @@ program developed by:shabreena vincent
 register number:212222230141
 ```
 ```
-#include "main.h"
-
-
-
-
+TIM_HandleTypeDef htim2;
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_TIM2_Init(void);
 int main(void)
 {
-  
   HAL_Init();
-
- 
   SystemClock_Config();
-
-  
   MX_GPIO_Init();
   MX_TIM2_Init();
-  
   HAL_TIM_Base_Start(&htim2);
   HAL_TIM_PWM_Init(&htim2);
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
   while (1)
   {
-    
   }
-
 }
-
-
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
- 
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
-  
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 72;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV6;
+  RCC_OscInitStruct.PLL.PLLN = 84;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
-  
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
@@ -159,29 +139,22 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
 }
-
-
 static void MX_TIM2_Init(void)
 {
-
- 
-
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
-
- 
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 47;
+  htim2.Init.Prescaler = 41;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 1000;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
@@ -202,90 +175,70 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 800;
+  sConfigOC.Pulse = 900;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
- 
   HAL_TIM_MspPostInit(&htim2);
 
 }
-
-
 static void MX_GPIO_Init(void)
 {
-
-
   __HAL_RCC_GPIOA_CLK_ENABLE();
-
 }
-
-
 void Error_Handler(void)
 {
-  
   __disable_irq();
   while (1)
   {
   }
-  
-}
-
 #ifdef  USE_FULL_ASSERT
-
 void assert_failed(uint8_t *file, uint32_t line)
 {
- 
+
 }
+#endif
 
 ```
-
-
-
 ## Output screen shots of proteus  :
-## FOR PULSE AT 500
-![circuit 1](https://github.com/vasundrasriravi/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/119393983/4205ba7f-099f-4af1-9911-1615bd37cb27)
-
-## FOR PULSE AT 700
-![circuit 2](https://github.com/vasundrasriravi/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/119393983/4ef8c179-9669-4f55-9b61-275dbc881111)
-
-## FOR PULSE AT 900
-![circuit 3](https://github.com/vasundrasriravi/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/119393983/774eb294-7780-44f7-8aba-270b13837201)
+![WhatsApp Image 2024-04-27 at 09 23 31_14ed465e](https://github.com/Nagul71/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/118661118/fda07530-0c11-4e83-8fb5-cee73d5fe072)
 
 
 
- 
  ## CIRCUIT DIAGRAM (EXPORT THE GRAPHICS TO PDF AND ADD THE SCREEN SHOT HERE): 
- ![circuit ](https://github.com/vasundrasriravi/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/119393983/55bce779-df86-4e4d-85c4-101d47c61dc2)
+ 
+![image](https://github.com/Nagul71/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/118661118/d8fcef17-f06f-44e2-a97f-a03cb06cd86d)
 
 
 ## DUTY CYCLE AND FREQUENCY CALCULATION 
 FOR PULSE AT 500
+TON = 2ms 
+TOFF= 2ms 
+TOTAL TIME = 4ms 
+FREQUENCY = 1/(TOTAL TIME)=1/4=250Hz
 
-TON = 8
-TOFF= 8
-TOTAL TIME = 16
-FREQUENCY = 1/(TOTAL TIME)
-FREQUENCY = 62.5Hz
+![image](https://github.com/Nagul71/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/118661118/93647dd4-bcdf-43a1-bd17-f49750b24b46)
+
 
 FOR PULSE AT 700
+TON = 3ms 
+TOFF= 1ms
+TOTAL TIME = 4ms 
+FREQUENCY = 1/(TOTAL TIME)=1/4=250Hz
+![image](https://github.com/Nagul71/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/118661118/2901fd41-34a8-4ba5-882c-423e98a7d631)
 
-TON = 13
-TOFF= 3
-TOTAL TIME = 16
-FREQUENCY = 1/(TOTAL TIME)
-FREQUENCY = 62.5Hz
 
 FOR PULSE AT 900
+TON = 3.5ms 
+TOFF= 0.5ms 
+TOTAL TIME = 4ms
+FREQUENCY = 1/(TOTAL TIME)=1/4=250Hz
 
-TON = 14
-TOFF= 2
-TOTAL TIME = 16
-FREQUENCY = 1/(TOTAL TIME)
-FREQUENCY = 62.5Hz
+![image](https://github.com/Nagul71/EXPERIMENT--07-SQUARE-WAVE-GENERATION-AT-THE-OUTPUT-PIN-USING-TIMER/assets/118661118/8b552afe-088e-49dd-996a-b89a4b0a516f)
+
 
 ## Result :
 A PWM Signal is generated using the following frequency and various duty cycles are simulated 
